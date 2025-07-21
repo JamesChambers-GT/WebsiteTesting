@@ -7,6 +7,9 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+const { logChat } = require('./excel-logger');
+
+
 // Serve static files from public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -20,6 +23,12 @@ io.on('connection', (socket) => {
     // Send to everyone (including sender)
     io.emit('chat message', msg);
   });
+
+  socket.on('chat message', (msg) => {
+    io.emit('chat message', msg); // broadcast to all
+    logChat(socket.id, msg);       // log to Excel
+  });
+
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
