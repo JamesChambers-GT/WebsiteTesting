@@ -3,7 +3,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 const path = require('path');
 require('dotenv').config();
-const { getChatReply } = require('./chatHandler');
+const { getChatReply } = require('./chat-handler');
 
 app.use(express.static('public'));
 app.use(express.json());
@@ -24,7 +24,6 @@ app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
 
-console.log('Node version:', process.version);
 
 
 app.listen(port, () => {
