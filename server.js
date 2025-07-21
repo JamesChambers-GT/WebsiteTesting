@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const { logChat } = require('./excel-logger');
+const { saveMessage } = require('./db');
 
 
 // Serve static files from public folder
@@ -19,9 +19,8 @@ io.on('connection', (socket) => {
 
   
   socket.on('chat message', (msg) => {
-    io.emit('chat message', msg); // broadcast to all
-    logChat(socket.id, msg);       // log to Excel
-    console.log(`Message from ${socket.id}: ${msg}`);
+    io.emit('chat message', msg);
+    saveMessage(socket.id, msg); // Save to SQLite
   });
 
 
