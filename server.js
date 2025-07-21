@@ -17,16 +17,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  // Listen for messages from this client
-  socket.on('chat message', (msg) => {
-    console.log(`Message from ${socket.id}: ${msg}`);
-    // Send to everyone (including sender)
-    io.emit('chat message', msg);
-  });
-
+  
   socket.on('chat message', (msg) => {
     io.emit('chat message', msg); // broadcast to all
     logChat(socket.id, msg);       // log to Excel
+    console.log(`Message from ${socket.id}: ${msg}`);
   });
 
 
