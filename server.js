@@ -44,6 +44,7 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+console.log('Node version:', process.version);
 
 
 app.listen(port, () => {
