@@ -1,31 +1,22 @@
-document.getElementById('chat-form').addEventListener('submit', async (e) => {
+const socket = io(); // connect to server
+
+const form = document.getElementById('chat-form');
+const input = document.getElementById('input');
+const messages = document.getElementById('messages');
+
+// Send message when form is submitted
+form.addEventListener('submit', (e) => {
   e.preventDefault();
-
-  const input = document.getElementById('user-input');
-  const message = input.value.trim();
-  if (!message) return;
-
-  appendMessage('You', message);
-  input.value = '';
-
-  try {
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
-    });
-
-    const data = await res.json();
-    appendMessage('ChatGPT', data.reply);
-  } catch (err) {
-    appendMessage('Error', 'Something went wrong.');
+  const msg = input.value;
+  if (msg) {
+    socket.emit('chat message', msg); // send to server
+    input.value = '';
   }
 });
 
-function appendMessage(sender, text) {
-  const box = document.getElementById('chat-box');
-  const div = document.createElement('div');
-  div.innerHTML = `<span class="${sender === 'You' ? 'user' : 'bot'}">${sender}:</span> ${text}`;
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
-}
+// Listen for messages from server
+socket.on('chat message', (msg) => {
+  const item = document.createElement('li');
+  item.textContent = msg;
+  messages.appendChild(item);
+});
