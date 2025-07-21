@@ -8,16 +8,16 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
-app.get('/page1', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'page1.html'));
+app.get('/p1', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'p1.html'));
 });
 
-app.get('/page2', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'page2.html'));
+app.get('/p2', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'p2.html'));
 });
 
-app.get('/page3', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'page3.html'));
+app.get('/p3', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'p3.html'));
 });
 
 app.get('/home', (req,res) => {
