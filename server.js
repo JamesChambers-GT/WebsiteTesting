@@ -9,7 +9,9 @@ app.listen(port, () => {
 });
 
 app.get('/p1', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'p1.html'));
+  const filePath = path.join(__dirname, 'public', 'p1.html');
+  console.log('Serving:', filePath);
+  res.sendFile(filePath);
 });
 
 app.get('/p2', (req, res) => {
