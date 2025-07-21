@@ -3,33 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Current Time</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 100px;
-      background-color: #f0f0f0;
-    }
-    #clock {
-      font-size: 48px;
-      color: #333;
-    }
-  </style>
+  <title>Home</title>
+  <link rel="stylesheet" href="indexstyle.css" />
 </head>
 <body>
-  <h1>Current Time</h1>
-  <div id="clock">Loading...</div>
-
-  <script>
-    function updateTime() {
-      const now = new Date();
-      const timeString = now.toLocaleTimeString();
-      document.getElementById("clock").textContent = timeString;
-    }
-
-    updateTime(); // Initial call
-    setInterval(updateTime, 1000); // Update every second
-  </script>
+  <h1>Welcome to My Website</h1>
+  <a href="p1.html">Page 1: About</a>
+  <a href="p2.html">Page 2: Projects</a>
+  <a href="p3.html">Page 3: Contact</a>
 </body>
 </html>
