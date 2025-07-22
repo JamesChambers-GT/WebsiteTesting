@@ -8,8 +8,8 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 
-const { connectDB, saveUser, getAllUsers } = require('./db');
-connectDB();
+const { connectDB, getDB } = require('./db');
+connectDB(); // Make sure this is called before any DB usage
 
 
 // Serve static files from public folder
@@ -17,23 +17,30 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/users', express.json(), async (req, res) => {
   try {
+    const db = getDB();
+    const users = db.collection('users');
+
     const { username, email } = req.body;
-    await saveUser({ username, email });
+    await users.insertOne({ username, email, joinedAt: new Date() });
+
     res.status(201).json({ success: true });
   } catch (err) {
-    console.error('❌ Failed to save user:', err);
+    console.error('❌ Save error:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
 app.get('/api/users', async (req, res) => {
   try {
-    const users = await getAllUsers();
+    const db = getDB();
+    const users = await db.collection('users').find({}).toArray();
     res.json(users);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Failed to fetch users:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 
 // WebSocket logic

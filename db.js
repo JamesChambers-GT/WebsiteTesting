@@ -1,14 +1,13 @@
 // db.js
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-const uri = process.env.MONGO_URI; // store the full URI as an env var in Render
-
+const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  },
+  }
 });
 
 let db;
@@ -16,25 +15,18 @@ let db;
 async function connectDB() {
   try {
     await client.connect();
-    db = client.db("WebTesting"); // replace with your DB name
-    console.log("✅ Connected to MongoDB Atlas");
+    db = client.db("WebTesting"); // Replace with your actual DB name
+    console.log("✅ MongoDB connected");
   } catch (err) {
-    console.error("❌ MongoDB connection error:", err);
+    console.error("❌ MongoDB connection failed:", err);
   }
 }
 
 function getDB() {
+  if (!db) {
+    throw new Error('❌ Database not connected. Did you call connectDB()?');
+  }
   return db;
 }
 
-async function saveUser({ username, email }) {
-  const users = db.collection("users");
-  return await users.insertOne({ username, email, joinedAt: new Date() });
-}
-
-async function getAllUsers() {
-  const users = db.collection("users");
-  return await users.find({}).toArray();
-}
-
-module.exports = { connectDB, getDB, saveUser, getAllUsers };
+module.exports = { connectDB, getDB };
