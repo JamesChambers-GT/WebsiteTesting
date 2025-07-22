@@ -1,31 +1,40 @@
-const mongoose = require('mongodb')
-mongoose.connect(process.env.MONGO_DB);
+// db.js
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  email: String,
-  joinedAt: { type: Date, default: Date.now }
+const uri = process.env.MONGO_URI; // store the full URI as an env var in Render
+
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
 });
 
-const User = mongoose.model('User', userSchema);
+let db;
 
 async function connectDB() {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('✅ MongoDB connected');
+    await client.connect();
+    db = client.db("WebTesting"); // replace with your DB name
+    console.log("✅ Connected to MongoDB Atlas");
   } catch (err) {
-    console.error('❌ DB connection error:', err);
+    console.error("❌ MongoDB connection error:", err);
   }
+}
+
+function getDB() {
+  return db;
 }
 
 async function saveUser({ username, email }) {
-  try {
-    const user = new User({ username, email });
-    await user.save();
-    console.log('✅ User saved');
-  } catch (err) {
-    console.error('❌ Save error:', err.message);
-  }
+  const users = db.collection("users");
+  return await users.insertOne({ username, email, joinedAt: new Date() });
 }
 
-module.exports = { connectDB, saveUser };
+async function getAllUsers() {
+  const users = db.collection("users");
+  return await users.find({}).toArray();
+}
+
+module.exports = { connectDB, getDB, saveUser, getAllUsers };

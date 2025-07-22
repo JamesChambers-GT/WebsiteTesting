@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Registration</title>
+</head>
+<body>
+  <h1>Register</h1>
+  <form id="user-form">
+    <input type="text" id="username" placeholder="Username" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <button type="submit">Submit</button>
+  </form>
+
+  <h2>Registered Users</h2>
+  <ul id="user-list"></ul>
+
+  <script>
+    const form = document.getElementById('user-form');
+    const userList = document.getElementById('user-list');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert('User saved!');
+        loadUsers();
+      } else {
+        alert('Error: ' + data.error);
+      }
+
+      form.reset();
+    });
+
+    async function loadUsers() {
+      const res = await fetch('/api/users');
+      const users = await res.json();
+      userList.innerHTML = '';
+      users.forEach(user => {
+        const item = document.createElement('li');
+        item.textContent = `${user.username} (${user.email})`;
+        userList.appendChild(item);
+      });
+    }
+
+    // Load users when page loads
+    loadUsers();
+  </script>
+</body>
+</html>

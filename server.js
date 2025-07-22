@@ -8,21 +8,30 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 
-const { connectDB, saveUser } = require('./db');
-connectDB(); // Call this once when server starts
-
+const { connectDB, saveUser, getAllUsers } = require('./db');
+connectDB();
 
 
 // Serve static files from public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/users', express.json(), async (req, res) => {
-  const { username, email } = req.body;
   try {
+    const { username, email } = req.body;
     await saveUser({ username, email });
-    res.json({ success: true });
+    res.status(201).json({ success: true });
   } catch (err) {
+    console.error('❌ Failed to save user:', err);
     res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await getAllUsers();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
