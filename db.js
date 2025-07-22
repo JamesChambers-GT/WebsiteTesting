@@ -1,38 +1,30 @@
-// db.js
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./chat.db');
+mongoose.connect(process.env.MONGO_DB);
 
-// Create table if it doesn't exist
-db.serialize(() => {
-  db.run(`
-    CREATE TABLE IF NOT EXISTS messages (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user TEXT,
-      message TEXT,
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  email: String,
+  joinedAt: { type: Date, default: Date.now }
 });
 
-function saveMessage(user, message) {
-  db.run(
-    `INSERT INTO messages (user, message) VALUES (?, ?)`,
-    [user, message],
-    (err) => {
-      if (err) console.error('Error saving message:', err);
-    }
-  );
+const User = mongoose.model('User', userSchema);
+
+async function connectDB() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('✅ MongoDB connected');
+  } catch (err) {
+    console.error('❌ DB connection error:', err);
+  }
 }
 
-function getMessages(callback) {
-  db.all(`SELECT * FROM messages ORDER BY timestamp ASC`, (err, rows) => {
-    if (err) {
-      console.error('Error fetching messages:', err);
-      callback([]);
-    } else {
-      callback(rows);
-    }
-  });
+async function saveUser({ username, email }) {
+  try {
+    const user = new User({ username, email });
+    await user.save();
+    console.log('✅ User saved');
+  } catch (err) {
+    console.error('❌ Save error:', err.message);
+  }
 }
 
-module.exports = { saveMessage, getMessages };
+module.exports = { connectDB, saveUser };

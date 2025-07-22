@@ -7,11 +7,25 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const { saveMessage } = require('./db');
+
+const { connectDB, saveUser } = require('./db');
+connectDB(); // Call this once when server starts
+
 
 
 // Serve static files from public folder
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.post('/api/users', express.json(), async (req, res) => {
+  const { username, email } = req.body;
+  try {
+    await saveUser({ username, email });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 
 // WebSocket logic
 io.on('connection', (socket) => {
