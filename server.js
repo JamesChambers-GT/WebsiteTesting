@@ -1,38 +1,42 @@
+//required modules
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
+const bodyParser = require('body-parser');
+require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
 
-// Serve static files from public folder
-app.use(express.static(path.join(__dirname, 'public')));
-/**
+
+//imported backend methods
+  //DB
 const { connectDB, getDB } = require('./db');
-console.log("connecting 1/2")
-connectDB(); // Make sure this is called before any DB usage
+console.log("connecting 1/2");
+connectDB(); 
+  //AI
+const chatHandler = require('./chat-handler');
+
+
+//app.use methods
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+
+//app.post methods
+  //DB
+    
+  //AI
+app.post('/api/chat', chatHandler);
 
 
 
 
-app.post('/api/users', express.json(), async (req, res) => {
-  try {
-    const db = getDB();
-    const users = db.collection('users');
 
-    const { username, email } = req.body;
-    await users.insertOne({ username, email, joinedAt: new Date() });
-
-    res.status(201).json({ success: true });
-  } catch (err) {
-    console.error('❌ Save error:', err.message);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
+//app.get methods
+  //fetch all users
 app.get('/api/users', async (req, res) => {
   try {
     const db = getDB();
@@ -63,7 +67,10 @@ io.on('connection', (socket) => {
 });
 
 
-*/
+
+
+
+
 
 // Start the server
 const PORT = process.env.PORT || 3000;

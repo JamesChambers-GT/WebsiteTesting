@@ -1,19 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ChatGPT Interface</title>
-  <link rel="stylesheet" href="chat.css">
+  <meta charset="UTF-8">
+  <title>AI Chat Test</title>
 </head>
 <body>
-  <div id="chat-container">
-    <h1>Talk to ChatGPT</h1>
-    <div id="chat-box"></div>
-    <form id="chat-form">
-      <input type="text" id="user-input" placeholder="Type a message..." autocomplete="off" />
-      <button type="submit">Send</button>
-    </form>
-  </div>
-  <script src="chat.js"></script>
+  <h1>AI Chat Test</h1>
+
+  <form id="chatForm">
+    <label>
+      System Prompt:<br>
+      <input type="text" id="systemPrompt" value="You are a helpful assistant." size="50">
+    </label><br><br>
+
+    <label>
+      Conversation JSON (optional):<br>
+      <textarea id="conversation" rows="5" cols="60">[]</textarea>
+    </label><br><br>
+
+    <label>
+      Your Question:<br>
+      <input type="text" id="question" size="50">
+    </label><br><br>
+
+    <button type="submit">Send</button>
+  </form>
+
+  <h2>AI Reply:</h2>
+  <pre id="reply"></pre>
+
+  <script>
+    document.getElementById('chatForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const systemPrompt = document.getElementById('systemPrompt').value;
+      const question = document.getElementById('question').value;
+      let conversation;
+
+      try {
+        conversation = JSON.parse(document.getElementById('conversation').value);
+      } catch (err) {
+        alert("Conversation must be valid JSON");
+        return;
+      }
+
+      const res = await fetch('http://localhost:3000/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ systemPrompt, conversation, question })
+      });
+
+      const data = await res.json();
+      document.getElementById('reply').textContent = data.reply || JSON.stringify(data, null, 2);
+    });
+  </script>
 </body>
 </html>

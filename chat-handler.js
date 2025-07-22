@@ -1,29 +1,36 @@
-// chatHandler.js
-const fetch = global.fetch || require('node-fetch');
+const { Configuration, OpenAIApi } = require('openai');
+require('dotenv').config();
 
-async function getChatReply(userMessage) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: 'You are a helpful assistant.' },
-        { role: 'user', content: userMessage }
-      ]
-    })
-  });
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
 
-  const data = await response.json();
+async function chatHandler(req, res) {
+  const { systemPrompt, conversation, question } = req.body;
 
-  if (!response.ok) {
-    throw new Error(data?.error?.message || 'OpenAI API Error');
+  if (!systemPrompt || !Array.isArray(conversation) || !question) {
+    return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  return data.choices?.[0]?.message?.content || 'No response.';
+  try {
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...conversation,
+      { role: 'user', content: question },
+    ];
+
+    const response = await openai.createChatCompletion({
+      model: 'gpt-4',
+      messages,
+    });
+
+    const reply = response.data.choices[0].message.content;
+    res.json({ reply });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'OpenAI API error', details: err.message });
+  }
 }
 
-module.exports = { getChatReply };
+module.exports = chatHandler;
