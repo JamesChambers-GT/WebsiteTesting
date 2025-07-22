@@ -1,3 +1,4 @@
+const mongoose = require('mongodb')
 mongoose.connect(process.env.MONGO_DB);
 
 const userSchema = new mongoose.Schema({
