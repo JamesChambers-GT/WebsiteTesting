@@ -7,14 +7,16 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+
+// Serve static files from public folder
+app.use(express.static(path.join(__dirname, 'public')));
 /**
 const { connectDB, getDB } = require('./db');
 console.log("connecting 1/2")
 connectDB(); // Make sure this is called before any DB usage
 
 
-// Serve static files from public folder
-app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.post('/api/users', express.json(), async (req, res) => {
   try {
