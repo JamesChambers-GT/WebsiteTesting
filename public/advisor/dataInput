@@ -1,0 +1,19 @@
+<!--Back to login, and to SO,MA, data entry-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Website</title>
+</head>
+<body>
+  <h1>Welcome to data Entry, advisor</h1>
+
+  <nav>
+    <ul>
+      <li><a href="advisorhome.html">Back to homepage</a></li>
+    </ul>
+  </nav>
+
+  <p>Engage in data entry</p>
+</body>
+</html>
