@@ -10,7 +10,6 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-console.log("KYS")
 
 //imported backend methods
   //DB
@@ -26,7 +25,14 @@ app.use(express.json());
   //DB
     
   //AI
-app.post('/api/chat', chatHandler);
+app.post('/api/chat', call_chat);
+  //testing
+
+  
+app.post('/api/hello', (req, res) => {
+  const { name } = req.body;
+  res.json({ message: `Hello ${name}` });
+});
 
 
 

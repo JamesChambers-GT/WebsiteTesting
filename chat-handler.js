@@ -1,4 +1,5 @@
-import OpenAI from "openai";
+//import OpenAI from "openai";
+const OpenAI = require('openai')
 const client = new OpenAI(process.env.OPENAI_API_KEY);
 
 async function call_chat(req,res) {
@@ -14,7 +15,7 @@ async function call_chat(req,res) {
   
   const response = await client.responses.create({
     model: "gpt-4.1",
-    messages
+    input: [{role: 'user', content: 'what is 123+321?'}]
   });
 
   reply = response.output_text
