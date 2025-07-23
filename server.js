@@ -13,6 +13,7 @@ const io = new Server(server);
 
 //imported backend methods
   //DB
+const {getNextClient, getNextAdvisor} = require('./data-hander')
   //AI
 const call_chat = require('./chat-handler');
 
@@ -23,34 +24,26 @@ app.use(express.json());
 
 //app.post methods
   //DB
-    
+app.post('/api/hello', async (req, res) => {
+  const db = await connectToDatabase();
+  const collection = db.collection('test');
+  await collection.insertOne({ name: req.body.name });
+  res.json({ message: "Data saved" });
+});
   //AI
 app.post('/api/chat', call_chat);
   //testing
 
-  
-app.post('/api/hello', (req, res) => {
-  const { name } = req.body;
-  res.json({ message: `Hello ${name}` });
-});
+
 
 
 
 
 
 //app.get methods
-  //fetch all users
-app.get('/api/users', async (req, res) => {
-  try {
-    const db = getDB();
-    const users = await db.collection('users').find({}).toArray();
-    res.json(users);
-  } catch (err) {
-    console.error('Failed to fetch users:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
+  //next advisor, client
+app.get('/api/nextA', getNextAdvisor)
+app.get('/api/nextC', getNextClient)
 
 
 // WebSocket logic

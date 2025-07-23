@@ -1,6 +1,6 @@
-//import OpenAI from "openai";
 const OpenAI = require('openai')
 const client = new OpenAI(process.env.OPENAI_API_KEY);
+
 
 async function call_chat(req,res) {
 

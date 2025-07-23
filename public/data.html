@@ -1,0 +1,36 @@
+<form id="testform">
+  <input name="name" id="nameInput" />
+  <button type="submit">Submit</button>
+</form>
+<p id="test"></p>
+
+<form id="testform2">
+  <button type="submit">get next A</button>
+  <p id="advisor next">to be set</p>
+</form>
+<p id="test2"></p>
+
+<script>
+document.getElementById('testform').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  document.getElementById('test').textContent = ""
+  const name = document.getElementById('nameInput').value;
+  const res = await fetch('/api/hello', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name })
+  });
+  const data = await res.json();
+  document.getElementById('test').textContent = data.message;
+});
+
+document.getElementById('testform2').addEventListener('submit',async function (e) {
+    e.preventDefault();
+    console.log("FE: fetching")
+    const res = await fetch('/api/nextA');
+    const data = await res.json();
+    document.getElementById('test2').textContent = data.Next
+
+});
+
+</script>
