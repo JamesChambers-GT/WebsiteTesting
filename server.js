@@ -10,15 +10,12 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-
+console.log("KYS")
 
 //imported backend methods
   //DB
-const { connectDB, getDB } = require('./db');
-console.log("connecting 1/2");
-connectDB(); 
   //AI
-const chatHandler = require('./chat-handler');
+const call_chat = require('./chat-handler');
 
 
 //app.use methods

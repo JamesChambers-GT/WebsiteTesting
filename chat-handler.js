@@ -1,36 +1,29 @@
-const { Configuration, OpenAIApi } = require('openai');
-require('dotenv').config();
+import OpenAI from "openai";
+const client = new OpenAI(process.env.OPENAI_API_KEY);
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
+async function call_chat(req,res) {
 
-async function chatHandler(req, res) {
-  const { systemPrompt, conversation, question } = req.body;
+  const {system, conversation, question} = req.body
 
-  if (!systemPrompt || !Array.isArray(conversation) || !question) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
 
-  try {
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      ...conversation,
-      { role: 'user', content: question },
-    ];
+  const messages = [
+    { role: 'system', content: system },
+    ...conversation,
+    { role: 'user', content: question },
+  ];
+  
+  const response = await client.responses.create({
+    model: "gpt-4.1",
+    messages
+  });
 
-    const response = await openai.createChatCompletion({
-      model: 'gpt-4',
-      messages,
-    });
+  reply = response.output_text
+  res.json(reply)
 
-    const reply = response.data.choices[0].message.content;
-    res.json({ reply });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'OpenAI API error', details: err.message });
-  }
+
+
 }
 
-module.exports = chatHandler;
+
+
+module.exports = call_chat;
