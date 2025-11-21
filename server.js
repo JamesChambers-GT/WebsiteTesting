@@ -13,7 +13,7 @@ const io = new Server(server);
 
 //imported backend methods
   //DB
-const {getNextClient, getNextAdvisor} = require('./data-hander')
+const {newClient, newAdvisor} = require('./data-hander')
   //AI
 const call_chat = require('./chat-handler');
 
@@ -24,12 +24,8 @@ app.use(express.json());
 
 //app.post methods
   //DB
-app.post('/api/hello', async (req, res) => {
-  const db = await connectToDatabase();
-  const collection = db.collection('test');
-  await collection.insertOne({ name: req.body.name });
-  res.json({ message: "Data saved" });
-});
+app.post('/api/newC', newClient)
+app.post('/api/newA', newAdvisor)
   //AI
 app.post('/api/chat', call_chat);
   //testing
@@ -42,8 +38,6 @@ app.post('/api/chat', call_chat);
 
 //app.get methods
   //next advisor, client
-app.get('/api/nextA', getNextAdvisor)
-app.get('/api/nextC', getNextClient)
 
 
 // WebSocket logic

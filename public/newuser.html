@@ -2,70 +2,81 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>New User Page</title>
+  <title>Select Role</title>
   <style>
     body {
-      font-family: sans-serif;
-      padding: 2rem;
-      max-width: 400px;
-      margin: auto;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 80px;
     }
-    .role-button {
-      padding: 0.5rem 1rem;
-      margin: 0.5rem;
-      font-size: 1rem;
-      cursor: pointer;
+    input, button {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin: 10px;
     }
-    #codeForm {
+    #continue-btn {
       display: none;
-      margin-top: 1rem;
-    }
-    #message {
-      color: red;
-      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
+  <h1>Enter Your Name and Select Role</h1>
 
-  <h2>Select Your Role</h2>
-  <button class="role-button" onclick="selectRole('C')">Client</button>
-  <button class="role-button" onclick="selectRole('A')">Advisor</button>
+  <input type="text" id="nameInput" placeholder="Enter your name" />
 
-  <form id="codeForm" onsubmit="return handleSubmit(event)">
-    <label id="codeLabel" for="codeInput">Enter Code:</label><br>
-    <input type="text" id="codeInput" placeholder="C-1234 or A-1234" required><br><br>
-    <button type="submit">Submit</button>
-  </form>
+  <div>
+    <button onclick="handleSelection('Client')">Client</button>
+    <button onclick="handleSelection('Advisor')">Advisor</button>
+  </div>
 
-  <p id="message"></p>
+  <div id="continue-container">
+    <button id="continue-btn" onclick="continueAction()">Continue</button>
+  </div>
 
   <script>
-    let selectedPrefix = "";
+    let destination
+    async function handleSelection(role) {
+      const name = document.getElementById('nameInput').value.trim();
 
-    function selectRole(prefix) {
-      selectedPrefix = prefix;
-      document.getElementById('codeForm').style.display = 'block';
-      document.getElementById('codeLabel').textContent = `Enter ${prefix === 'C' ? 'Client' : 'Advisor'} Code (${prefix}-XXXX):`;
-      document.getElementById('codeInput').value = prefix + '-';
-      document.getElementById('message').textContent = '';
-    }
-
-    function handleSubmit(event) {
-      event.preventDefault();
-      const code = document.getElementById('codeInput').value.trim();
-      const pattern = new RegExp(`^${selectedPrefix}-\\d{4}$`);
-
-      if (!pattern.test(code)) {
-        document.getElementById('message').textContent = 'Invalid code format. Must be ' + selectedPrefix + '-XXXX.';
-        return false;
+      if (!name) {
+        alert("Please enter your name before selecting a role.");
+        return;
       }
 
-      // Example: send to backend or alert
-      alert('Submitted code: ' + code);
-      return true;
+      console.log(`User '${name}' selected: ${role}`);
+
+      // Example role-based logic
+      if (role === 'Client') {
+        destination = "client/clienthome.html"
+        const res = await fetch('/api/newC', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({name})
+        });
+
+
+
+      } else if (role === 'Advisor') {
+        destination = "advisor/advisorhome.html"
+        const res = await fetch('/api/newA', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({name})
+        })
+      }
+
+      // Show continue button
+      document.getElementById('continue-btn').style.display = 'inline-block';
+    }
+
+    function continueAction() {
+      const name = document.getElementById('nameInput').value.trim();
+      window.location.href = destination
     }
   </script>
-
 </body>
 </html>

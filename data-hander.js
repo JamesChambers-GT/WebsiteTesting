@@ -13,20 +13,19 @@ async function connectToDatabase() {
   }
 }
 
-async function getNextAdvisor(){
+async function getNextAdvisor(db){
   try{
-    const db = await connectToDatabase();
-    const item = await db.collection('Meta Data').findOne({index: '0'})
-    const text = item.nextAdvisor
+    const doc = await db.collection('Meta Data').findOne({index: '0'})
+    const text = doc.nextAdvisor
+    console.log("from gNA: ", text)
     return text
   } catch (err) {
     console.error("Couldn't get next advisor", err)
     //res.status(500).json({ error: 'Internal Server Error' });
   }
 }
-async function getNextClient(){
+async function getNextClient(db){
     try{
-        const db = await connectToDatabase();
         const item = await db.collection('Meta Data').findOne({index: '0'})
         const text = item.nextClient
         //res.json({Next: text})
@@ -37,13 +36,38 @@ async function getNextClient(){
     }
 }
 
+async function updateCCount(db){
+    newval = (parseInt(getNextClient()) + 1).toString().padStart(4,"0")
+
+    const collection = await db.collection('Meta Data')
+    await collection.updateOne(
+        {index: '0'},
+        {$set: {nextClient: newval}}
+    )
+}
+async function updateACount(db){
+    oldstr = await getNextAdvisor(db)
+    oldint = parseInt(oldstr)
+    newint = oldint+1
+    newstr = newint.toString().padStart(4,'0')
+    console.log("from UAC: ", newstr)
+
+
+    const collection = await db.collection('Meta Data')
+    await collection.updateOne(
+        {index: '0'},
+        {$set: {nextAdvisor: newstr}}
+    )
+}
+
 //make a new client in DB
 async function newClient(req,res){
+    db = await connectToDatabase();
+    console.log("making new client")
     const {name} = req.body
-    nextID = getNextClient()
+    nextID = await getNextClient(db)
     try{
-        const db = await connectToDatabase();
-        const collection = db.collection("Client Data")
+        const collection = await db.collection("Client Data")
         await collection.insertOne({
             _id: nextID,
             name: name,
@@ -51,7 +75,7 @@ async function newClient(req,res){
             income: null,
             age: null
         })
-        updateCCount()
+        await updateCCount(db)
 
     }catch (err) {
         console.error("could not add new client", err)
@@ -59,42 +83,25 @@ async function newClient(req,res){
 }
 //make a new advisor in DB
 async function newAdvisor(req,res){
+    const db = await connectToDatabase();
     const {name} = req.body
-    nextID = getNextAdvisor()
+    nextID = await getNextAdvisor(db)
+    console.log("new id:",nextID)
     try{
-        const db = await connectToDatabase();
-        const collection = db.collection("Client Data")
+        const collection = await db.collection("Advisor Data")
         await collection.insertOne({
             _id: nextID,
             name: name,
             c_ids: [null]
         })
-        updateACount()
+        await updateACount(db)
 
     }catch (err) {
         console.error("could not add new advisor", err)
     }
 }
 
-async function updateCCount(){
-    newval = (parseInt(getNextClient()) + 1).toString().padStart(4,"0")
 
-    const db = await connectToDatabase();
-    const collection = await db.collection('Meta Data')
-    await collection.updateOne(
-        {index: '0'},
-        {$set: {nextClient: newval}}
-    )
-}
-async function updateACount(){
-    newval = (parseInt(getNextAdvisor()) + 1).toString().padStart(4,"0")
-    const db = await connectToDatabase();
-    const collection = await db.collection('Meta Data')
-    await collection.updateOne(
-        {index: '0'},
-        {$set: {nextAdvisor: newval}}
-    )
-}
 
 
 module.exports = {newClient,newAdvisor};
